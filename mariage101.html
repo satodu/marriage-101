@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marriage 101</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.9.1/dist/gsap.min.js"></script>
+    <style>
+        .wrong {
+            color: red;
+        }
+        .right {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="ui container">
+        <h1 class="ui header">Marriage 101</h1>
+        <form id="namesForm" class="ui form">
+            <div class="field">
+                <label for="wifeName">Wife's Name:</label>
+                <input type="text" id="wifeName" name="wifeName" required>
+            </div>
+            <div class="field">
+                <label for="husbandName">Husband's Name:</label>
+                <input type="text" id="husbandName" name="husbandName" required>
+            </div>
+            <button type="submit" class="ui primary button">
+                <span>Generate Table</span>
+            </button>
+            <div id="loader" class="ui active inline loader" style="display:none;"></div>
+        </form>
+        <br>
+        <table id="resultsTable" class="ui celled table">
+            <thead>
+                <tr>
+                    <th>Wife</th>
+                    <th>Husband</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be added here -->
+            </tbody>
+        </table>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script>
+        document.getElementById('namesForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const wifeName = document.getElementById('wifeName').value;
+            const husbandName = document.getElementById('husbandName').value;
+            const resultsTable = document.getElementById('resultsTable').getElementsByTagName('tbody')[0];
+            const button = event.target.querySelector('button');
+            const loader = document.getElementById('loader');
+
+            const data = [
+                ["right", "wrong", `${wifeName} right`],
+                ["wrong", "right", `${wifeName} right`],
+                ["right", "right", `${wifeName} right`],
+                ["wrong", "wrong", `${husbandName} wrong`]
+            ];
+
+            resultsTable.innerHTML = ''; // Clear previous results
+            button.classList.add('loading');
+            loader.style.display = 'inline-block';
+            loader.textContent = '';
+
+            // GSAP animation for "Calculating results..." text
+            const text = "Calculating results...";
+            let textArray = text.split("");
+            loader.textContent = '';
+            
+            textArray.forEach((letter, index) => {
+                gsap.to(loader, {
+                    duration: 0.05,
+                    text: loader.textContent + letter,
+                    ease: "none",
+                    delay: index * 0.05
+                });
+            });
+
+            data.forEach((row, index) => {
+                setTimeout(() => {
+                    const newRow = resultsTable.insertRow();
+                    const cell1 = newRow.insertCell(0);
+                    const cell2 = newRow.insertCell(1);
+                    const cell3 = newRow.insertCell(2);
+
+                    cell1.textContent = row[0];
+                    cell2.textContent = row[1];
+                    cell3.textContent = '';
+
+                    if (row[0] === 'wrong') {
+                        cell1.classList.add('wrong');
+                    } else {
+                        cell1.classList.add('right');
+                    }
+
+                    if (row[1] === 'wrong') {
+                        cell2.classList.add('wrong');
+                    } else {
+                        cell2.classList.add('right');
+                    }
+
+                    let resultText = row[2];
+                    let resultArray = resultText.split("");
+                    cell3.textContent = '';
+                    
+                    resultArray.forEach((letter, i) => {
+                        setTimeout(() => {
+                            cell3.textContent += letter;
+                            if (index === data.length - 1 && i === resultArray.length - 1) {
+                                button.classList.remove('loading');
+                                loader.style.display = 'none';
+                                $('body').toast({
+                                    message: 'Calculations were done with 100% accuracy!',
+                                    class: 'success',
+                                    displayTime: 5000
+                                });
+                            }
+                        }, i * 100); // Adjust the typing speed here
+                    });
+
+                }, index * 2000);
+            });
+        });
+    </script>
+</body>
+</html>
