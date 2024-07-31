@@ -7,16 +7,47 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.css">
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.9.1/dist/gsap.min.js"></script>
     <style>
+        @media (min-width: 1024px) {
+            .top-container {
+                margin-top: 70px;
+            }
+        }
         .wrong {
             color: red;
         }
         .right {
             color: green;
         }
+        @media (max-width: 600px) {
+            .ui.table th, .ui.table td {
+                font-size: 12px;
+            }
+            .ui.form .field label {
+                font-size: 14px;
+            }
+            .ui.button {
+                font-size: 14px;
+            }
+            .ui.celled.table tbody tr td:nth-child(1)::before {
+                content: attr(data-label-wife);
+                font-weight: bold;
+                display: block;
+            }
+            .ui.celled.table tbody tr td:nth-child(2)::before {
+                content: attr(data-label-husband);
+                font-weight: bold;
+                display: block;
+            }
+            .ui.celled.table tbody tr td:nth-child(3)::before {
+                content: 'Result: ';
+                font-weight: bold;
+                display: block;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="ui container">
+    <div class="ui container top-container">
         <h1 class="ui header">Marriage 101</h1>
         <form id="namesForm" class="ui form">
             <div class="field">
@@ -30,7 +61,6 @@
             <button type="submit" class="ui primary button">
                 <span>Generate Table</span>
             </button>
-            <div id="loader" class="ui active inline loader" style="display:none;"></div>
         </form>
         <br>
         <table id="resultsTable" class="ui celled table">
@@ -57,25 +87,24 @@
             const husbandName = document.getElementById('husbandName').value;
             const resultsTable = document.getElementById('resultsTable').getElementsByTagName('tbody')[0];
             const button = event.target.querySelector('button');
-            const loader = document.getElementById('loader');
 
             const data = [
-                ["right", "wrong", `${wifeName} right`],
-                ["wrong", "right", `${wifeName} right`],
-                ["right", "right", `${wifeName} right`],
-                ["wrong", "wrong", `${husbandName} wrong`]
+                ["right", "wrong", `${wifeName} is right`],
+                ["wrong", "right", `${wifeName} is right`],
+                ["right", "right", `${wifeName} is right`],
+                ["wrong", "wrong", `${husbandName} is wrong`]
             ];
 
             resultsTable.innerHTML = ''; // Clear previous results
             button.classList.add('loading');
-            loader.style.display = 'inline-block';
-            loader.textContent = '';
 
             // GSAP animation for "Calculating results..." text
-            const text = "Calculating results...";
-            let textArray = text.split("");
+            const loaderText = "Calculating results...";
+            let textArray = loaderText.split("");
+            const loader = document.createElement('div');
+            button.appendChild(loader);
             loader.textContent = '';
-            
+
             textArray.forEach((letter, index) => {
                 gsap.to(loader, {
                     duration: 0.05,
@@ -95,6 +124,9 @@
                     cell1.textContent = row[0];
                     cell2.textContent = row[1];
                     cell3.textContent = '';
+
+                    cell1.setAttribute('data-label-wife', `${wifeName} : `);
+                    cell2.setAttribute('data-label-husband', `${husbandName} : `);
 
                     if (row[0] === 'wrong') {
                         cell1.classList.add('wrong');
@@ -117,7 +149,7 @@
                             cell3.textContent += letter;
                             if (index === data.length - 1 && i === resultArray.length - 1) {
                                 button.classList.remove('loading');
-                                loader.style.display = 'none';
+                                loader.remove();
                                 $('body').toast({
                                     message: 'Calculations were done with 100% accuracy!',
                                     class: 'success',
