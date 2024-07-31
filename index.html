@@ -13,7 +13,17 @@
             }
             #shareButton {
                 display: none;
-                margin-top: 20px;
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 1000;
+                padding: 10px;
+                border-radius: 50%;
+                background-color: black; /* Black color */
+                color: white;
+            }
+            .pulse {
+                animation: pulse 2s infinite;
             }
         }
         .wrong {
